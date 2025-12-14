@@ -2,85 +2,361 @@
 const pool = require("../services/db");
 
 const SQLSTATEMENT = `
-DROP TABLE IF EXISTS Pokedex;
+  DROP DATABASE IF EXISTS bed_basketball_wellness;
+  CREATE DATABASE bed_basketball_wellness;
+  USE bed_basketball_wellness;
+  
 
-DROP TABLE IF EXISTS Pokemon;
+  CREATE TABLE User (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    points INT DEFAULT 0,
+    tickets INT DEFAULT 0,
+    current_level INT DEFAULT 1
+  );
+  
+  CREATE TABLE WellnessChallenge (
+    challenge_id INT AUTO_INCREMENT PRIMARY KEY,
+    creator_id INT NOT NULL,
+    description TEXT NOT NULL,
+    points INT NOT NULL,
+    CONSTRAINT fk_challenge_creator
+      FOREIGN KEY (creator_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+  );
+  
+  CREATE TABLE UserCompletion (
+    completion_id INT AUTO_INCREMENT PRIMARY KEY,
+    challenge_id INT NOT NULL,
+    user_id INT NOT NULL,
+    details TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_completion_challenge
+      FOREIGN KEY (challenge_id) REFERENCES WellnessChallenge(challenge_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_completion_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+  
 
-DROP TABLE IF EXISTS Player;
+  CREATE TABLE BasketballPlayer (
+    player_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    rarity ENUM('Common','Rare','Epic','Legendary') NOT NULL,
+    archetype ENUM('Shooter','Defender','Playmaker') NOT NULL,
+    era ENUM('90s','00s','Modern') NOT NULL,
+    power_value INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE SummonBanner (
+    banner_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    cost_points INT NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+  );
+  
+  CREATE TABLE BannerPlayer (
+    banner_id INT NOT NULL,
+    player_id INT NOT NULL,
+    PRIMARY KEY (banner_id, player_id),
+    CONSTRAINT fk_bp_banner
+      FOREIGN KEY (banner_id) REFERENCES SummonBanner(banner_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_bp_player
+      FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+  
 
-CREATE TABLE Pokemon (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  owner_id INT NOT NULL,
-  dex_num INT NOT NULL,
-  hp INT,
-  atk INT,
-  def INT
-);
+  CREATE TABLE UserRoster (
+    roster_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    player_id INT NOT NULL,
+    obtained_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_roster_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_roster_player
+      FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT,
+    INDEX idx_roster_user (user_id),
+    INDEX idx_roster_player (player_id)
+  );
+  
+  CREATE TABLE UserTeam (
+    user_id INT NOT NULL,
+    slot TINYINT NOT NULL,         
+    player_id INT NOT NULL,
+    PRIMARY KEY (user_id, slot),
+    CONSTRAINT fk_team_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_team_player
+      FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+  );
+  
 
-CREATE TABLE Pokedex (
-  number INT PRIMARY KEY AUTO_INCREMENT,
-  name TEXT NOT NULL,
-  type1 TEXT NOT NULL,
-  type2 TEXT NOT NULL
-);
+  CREATE TABLE Level (
+    level_id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    recommended_power INT NOT NULL,
+    first_clear_reward INT NOT NULL,
+    repeat_reward INT NOT NULL
+  );
+  
+  CREATE TABLE LevelOpponent (
+    level_id INT NOT NULL,
+    slot TINYINT NOT NULL,         
+    player_id INT NOT NULL,
+    PRIMARY KEY (level_id, slot),
+    CONSTRAINT fk_lo_level
+      FOREIGN KEY (level_id) REFERENCES Level(level_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_lo_player
+      FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+  );
+  
+  CREATE TABLE UserLevelProgress (
+    user_id INT NOT NULL,
+    level_id INT NOT NULL,
+    cleared TINYINT(1) NOT NULL DEFAULT 0,
+    cleared_at DATETIME NULL,
+    PRIMARY KEY (user_id, level_id),
+    CONSTRAINT fk_ulp_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_ulp_level
+      FOREIGN KEY (level_id) REFERENCES Level(level_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+  
+  CREATE TABLE UserLevelDaily (
+    user_id INT NOT NULL,
+    level_id INT NOT NULL,
+    play_date DATE NOT NULL,
+    repeat_wins_count INT NOT NULL DEFAULT 0,
+    loss_claimed TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, level_id, play_date),
+    CONSTRAINT fk_uld_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_uld_level
+      FOREIGN KEY (level_id) REFERENCES Level(level_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+  
+  CREATE TABLE MatchHistory (
+    match_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    level_id INT NOT NULL,
+    user_score INT NOT NULL,
+    opp_score INT NOT NULL,
+    result ENUM('WIN','LOSE') NOT NULL,
+    reward_points INT NOT NULL,
+    played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_match_user
+      FOREIGN KEY (user_id) REFERENCES User(user_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_match_level
+      FOREIGN KEY (level_id) REFERENCES Level(level_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    INDEX idx_match_user_date (user_id, played_at)
+  );
+  
 
-CREATE TABLE Player (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  name TEXT NOT NULL,
-  level INT NOT NULL,
-  created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+  
+  CREATE TABLE SynergyRule (
+    rule_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    buff_type ENUM('TEAM_POWER_MULT') NOT NULL,
+    buff_value DECIMAL(6,3) NOT NULL  
+  );
+  
+  CREATE TABLE SynergyRuleMember (
+    rule_id INT NOT NULL,
+    player_id INT NOT NULL,
+    PRIMARY KEY (rule_id, player_id),
+    CONSTRAINT fk_srm_rule
+      FOREIGN KEY (rule_id) REFERENCES SynergyRule(rule_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT fk_srm_player
+      FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+  );
 
-INSERT INTO Pokedex (number, name, type1, type2) VALUES
-(1, 'Bulbasaur', 'Grass', 'Poison'),
-(2, 'Ivysaur', 'Grass', 'Poison'),
-(3, 'Venusaur', 'Grass', 'Poison'),
-(4, 'Charmander', 'Fire', ''),
-(5, 'Charmeleon', 'Fire', ''),
-(6, 'Charizard', 'Fire', 'Flying'),
-(7, 'Squirtle', 'Water', ''),
-(8, 'Wartortle', 'Water', ''),
-(9, 'Blastoise', 'Water', '');
+  INSERT INTO User (user_id, username, points, tickets, current_level) VALUES
+  (1, 'liam',    120, 5, 1),
+  (2, 'amanda',   80, 3, 1),
+  (3, 'weijie',   60, 2, 1),
+  (4, 'sarah',    40, 1, 1),
+  (5, 'gareth',   20, 0, 1);
+  
 
-INSERT INTO Player (name, level) VALUES
-('Ash', 1),
-('Misty', 21),
-('Brock', 30);
+  INSERT INTO WellnessChallenge (challenge_id, creator_id, description, points) VALUES
+  (1, 1, 'Sleep like a boss – Get 7+ hours of sleep', 10),
+  (2, 1, 'Stairs over elevator – Take the stairs today', 20),
+  (3, 2, 'Digital detox – No phone for 1 hour', 10),
+  (4, 2, 'Touch grass IRL – 15-minute walk outside', 10),
+  (5, 2, 'IRL > DMs – Talk to a friend face-to-face', 20),
+  (6, 3, 'Declutter your chaos – Clean your desk/room', 20),
+  (7, 3, 'Hydration check – Drink 6 cups of water', 10),
+  (8, 4, 'Stretch session – 10 minutes stretching', 10),
+  (9, 4, 'Focus sprint – 25 minutes deep work', 20),
+  (10, 5, 'Early bird – Wake up before 7:00am', 20);
+  
+  INSERT INTO UserCompletion (completion_id, challenge_id, user_id, details) VALUES
+  (1, 1, 2, 'Slept early and felt better in class.'),
+  (2, 2, 2, 'Took stairs all day, legs dying but worth.'),
+  (3, 4, 3, 'Walked after dinner, cleared my mind.'),
+  (4, 6, 1, 'Clean desk = clean brain.'),
+  (5, 9, 1, 'Finished a lab with one solid focus sprint.');
+  
 
-INSERT INTO Pokemon (owner_id, dex_num, hp, atk, def) VALUES
-(1, 4, 100, 5, 6),
-(2, 1, 100, 5, 6),
-(2, 5, 160, 27, 26),
-(2, 9, 200, 52, 55);
+  INSERT INTO BasketballPlayer (player_id, name, rarity, archetype, era, power_value) VALUES
+  (1,  'C-Role Player 01', 'Common', 'Defender',  'Modern', 10),
+  (2,  'C-Role Player 02', 'Common', 'Shooter',   'Modern', 10),
+  (3,  'C-Role Player 03', 'Common', 'Playmaker', 'Modern', 10),
+  (4,  'C-Role Player 04', 'Common', 'Defender',  '00s',    10),
+  (5,  'C-Role Player 05', 'Common', 'Shooter',   '00s',    10),
+  (6,  'C-Role Player 06', 'Common', 'Playmaker', '00s',    10),
+  (7,  'C-Role Player 07', 'Common', 'Defender',  '90s',    10),
+  (8,  'C-Role Player 08', 'Common', 'Shooter',   '90s',    10),
+  (9,  'C-Role Player 09', 'Common', 'Playmaker', '90s',    10),
+  (10, 'C-Role Player 10', 'Common', 'Defender',  'Modern', 10),
+  (11, 'C-Role Player 11', 'Common', 'Shooter',   'Modern', 10),
+  (12, 'C-Role Player 12', 'Common', 'Playmaker', 'Modern', 10),
+  (13, 'C-Role Player 13', 'Common', 'Defender',  '00s',    10),
+  (14, 'C-Role Player 14', 'Common', 'Shooter',   '00s',    10),
+  (15, 'C-Role Player 15', 'Common', 'Playmaker', '00s',    10),
+  (16, 'C-Role Player 16', 'Common', 'Defender',  '90s',    10),
+  (17, 'C-Role Player 17', 'Common', 'Shooter',   '90s',    10),
+  (18, 'C-Role Player 18', 'Common', 'Playmaker', '90s',    10),
+  (19, 'C-Role Player 19', 'Common', 'Defender',  'Modern', 10),
+  (20, 'C-Role Player 20', 'Common', 'Shooter',   'Modern', 10),
+  
+  (21, 'R-Starter 01', 'Rare', 'Shooter',   'Modern', 16),
+  (22, 'R-Starter 02', 'Rare', 'Playmaker', 'Modern', 16),
+  (23, 'R-Starter 03', 'Rare', 'Defender',  'Modern', 16),
+  (24, 'R-Starter 04', 'Rare', 'Shooter',   '00s',    16),
+  (25, 'R-Starter 05', 'Rare', 'Playmaker', '00s',    16),
+  (26, 'R-Starter 06', 'Rare', 'Defender',  '00s',    16),
+  (27, 'R-Starter 07', 'Rare', 'Shooter',   '90s',    16),
+  (28, 'R-Starter 08', 'Rare', 'Playmaker', '90s',    16),
+  (29, 'R-Starter 09', 'Rare', 'Defender',  '90s',    16),
+  (30, 'R-Starter 10', 'Rare', 'Shooter',   'Modern', 16),
+  (31, 'R-Starter 11', 'Rare', 'Playmaker', 'Modern', 16),
+  (32, 'R-Starter 12', 'Rare', 'Defender',  'Modern', 16),
+  
+  (33, 'E-All Star 01', 'Epic', 'Shooter',   'Modern', 23),
+  (34, 'E-All Star 02', 'Epic', 'Playmaker', 'Modern', 23),
+  (35, 'E-All Star 03', 'Epic', 'Defender',  '00s',    23),
+  (36, 'E-All Star 04', 'Epic', 'Shooter',   '00s',    23),
+  (37, 'E-All Star 05', 'Epic', 'Playmaker', '90s',    23),
+  (38, 'E-All Star 06', 'Epic', 'Defender',  '90s',    23),
+  
+  (39, 'L-Legend 01', 'Legendary', 'Shooter',   '90s', 31),
+  (40, 'L-Legend 02', 'Legendary', 'Playmaker', '00s', 31);
+  
 
-DROP TABLE IF EXISTS User;
+  INSERT INTO SummonBanner (banner_id, name, cost_points, is_active) VALUES
+  (1, 'Standard Banner', 50, 1),
+  (2, '90s Classics (Rate-Up)', 60, 1);
+  
+  INSERT INTO BannerPlayer (banner_id, player_id)
+  SELECT 1, player_id FROM BasketballPlayer;
+  
+  INSERT INTO BannerPlayer (banner_id, player_id)
+  SELECT 2, player_id FROM BasketballPlayer;
+  
 
-DROP TABLE IF EXISTS PlayerUserRel;
+  INSERT INTO Level (level_id, name, recommended_power, first_clear_reward, repeat_reward) VALUES
+  (1,  'Rookie Court',     55,  28,  7),
+  (2,  'Streetball Start', 65,  36,  9),
+  (3,  'Handle Check',     70,  44, 11),
+  (4,  'Midrange Trial',   80,  52, 13),
+  (5,  'Paint Pressure',   85,  60, 15),
+  (6,  'Fast Break',       95,  68, 17),
+  (7,  'Playoff Push',    105,  76, 19),
+  (8,  'Elite Eight',     112,  84, 21),
+  (9,  'Final Four',      120,  92, 23),
+  (10, 'Championship',    128, 100, 25);
+  
+  INSERT INTO LevelOpponent (level_id, slot, player_id) VALUES
+  (1,1,1),(1,2,2),(1,3,3),(1,4,4),(1,5,5),
+  (2,1,6),(2,2,7),(2,3,8),(2,4,9),(2,5,21),
+  (3,1,10),(3,2,11),(3,3,12),(3,4,13),(3,5,22),
+  (4,1,14),(4,2,15),(4,3,16),(4,4,23),(4,5,24),
+  (5,1,17),(5,2,18),(5,3,19),(5,4,25),(5,5,26),
+  (6,1,20),(6,2,1),(6,3,27),(6,4,28),(6,5,29),
+  (7,1,2),(7,2,3),(7,3,30),(7,4,31),(7,5,33),
+  (8,1,4),(8,2,21),(8,3,24),(8,4,32),(8,5,34),
+  (9,1,5),(9,2,26),(9,3,29),(9,4,35),(9,5,36),
+  (10,1,6),(10,2,30),(10,3,32),(10,4,37),(10,5,38);
+  
 
-CREATE TABLE PlayerUserRel (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  player_id INT NOT NULL
-);
+  INSERT INTO SynergyRule (rule_id, name, buff_type, buff_value) VALUES
+  (1, 'Splash Duo',   'TEAM_POWER_MULT', 1.050),
+  (2, 'Defense Wall', 'TEAM_POWER_MULT', 1.050),
+  (3, 'Legend Pair',  'TEAM_POWER_MULT', 1.100);
+  
+  INSERT INTO SynergyRuleMember (rule_id, player_id) VALUES
+  (1, 21), (1, 30),
+  (2, 26), (2, 32),
+  (3, 39), (3, 40);
+  
 
-CREATE TABLE User (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  username TEXT NOT NULL,
-  email TEXT NOT NULL,
-  password TEXT NOT NULL,
-  created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_login_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+  INSERT INTO UserRoster (roster_id, user_id, player_id) VALUES
+  (1, 1, 1),
+  (2, 1, 2),
+  (3, 1, 3),
+  (4, 1, 4),
+  (5, 1, 5),
+  (6, 1, 21),
+  (7, 1, 22);
+  
+  INSERT INTO UserTeam (user_id, slot, player_id) VALUES
+  (1, 1, 1),
+  (1, 2, 2),
+  (1, 3, 3),
+  (1, 4, 4),
+  (1, 5, 21);
+  
+  
+  SELECT l.level_id, l.name, COUNT(lo.player_id) AS opponent_count
+  FROM Level l
+  LEFT JOIN LevelOpponent lo ON lo.level_id = l.level_id
+  GROUP BY l.level_id, l.name
+  ORDER BY l.level_id;
+  
+  SELECT b.banner_id, b.name, COUNT(bp.player_id) AS pool_size
+  FROM SummonBanner b
+  LEFT JOIN BannerPlayer bp ON bp.banner_id = b.banner_id
+  GROUP BY b.banner_id, b.name
+  ORDER BY b.banner_id;
 
-INSERT INTO User (username, email, password) VALUES
-('admin', 'a@a.com', '1234'),
-('jack99', 'j@j.com', '1234');
-
-INSERT INTO PlayerUserRel (user_id, player_id) VALUES
-(1, 1),
-(1, 2),
-(2, 3);
 `;
 
 pool.query(SQLSTATEMENT, (error, results, fields) => {
