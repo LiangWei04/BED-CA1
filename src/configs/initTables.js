@@ -207,83 +207,78 @@ const SQLSTATEMENT = `
       ON DELETE RESTRICT
   );
 
-  INSERT INTO User (user_id, username, points, tickets, current_level) VALUES
-  (1, 'liam',    120, 5, 1),
-  (2, 'amanda',   80, 3, 1),
-  (3, 'weijie',   60, 2, 1),
-  (4, 'sarah',    40, 1, 1),
-  (5, 'gareth',   20, 0, 1);
+  INSERT INTO User (username) VALUES
+  ('liam'),
+  ('amanda'),
+  ('weijie'),
+  ('sarah'),
+  ('gareth');
   
 
-  INSERT INTO WellnessChallenge (challenge_id, creator_id, description, points) VALUES
-  (1, 1, 'Sleep like a boss – Get 7+ hours of sleep', 10),
-  (2, 1, 'Stairs over elevator – Take the stairs today', 20),
-  (3, 2, 'Digital detox – No phone for 1 hour', 10),
-  (4, 2, 'Touch grass IRL – 15-minute walk outside', 10),
-  (5, 2, 'IRL > DMs – Talk to a friend face-to-face', 20),
-  (6, 3, 'Declutter your chaos – Clean your desk/room', 20),
-  (7, 3, 'Hydration check – Drink 6 cups of water', 10),
-  (8, 4, 'Stretch session – 10 minutes stretching', 10),
-  (9, 4, 'Focus sprint – 25 minutes deep work', 20),
-  (10, 5, 'Early bird – Wake up before 7:00am', 20);
+  INSERT INTO WellnessChallenge (creator_id, description, points) VALUES
+  (1, 'Sleep like a boss – Get 7+ hours of sleep', 10),
+  (1, 'Stairs over elevator – Take the stairs today', 20),
+  (2, 'Digital detox – No phone for 1 hour', 10),
+  (2, 'Touch grass IRL – 15-minute walk outside', 10),
+  (2, 'IRL > DMs – Talk to a friend face-to-face', 20),
+  (3, 'Declutter your chaos – Clean your desk/room', 20),
+  (3, 'Hydration check – Drink 6 cups of water', 10),
+  (4, 'Focus sprint – 25 minutes deep work', 20),
+  (5, 'Early bird – Wake up before 7:00am', 20);
   
-  INSERT INTO UserCompletion (completion_id, challenge_id, user_id, details) VALUES
-  (1, 1, 2, 'Slept early and felt better in class.'),
-  (2, 2, 2, 'Took stairs all day, legs dying but worth.'),
-  (3, 4, 3, 'Walked after dinner, cleared my mind.'),
-  (4, 6, 1, 'Clean desk = clean brain.'),
-  (5, 9, 1, 'Finished a lab with one solid focus sprint.');
+  INSERT INTO UserCompletion (challenge_id, user_id, details) VALUES
+  (2, 1, 'Slept early and felt better in class.'),
+  (2, 2, 'Took stairs all day, legs dying but worth.'),
+  (4, 3, 'Walked after dinner, cleared my mind.'),
+  (6, 1, 'Clean desk = clean brain.'),
+  (8, 4, 'Finished a lab with one solid focus sprint.');
+
+  INSERT INTO BasketballPlayer ( name, rarity, archetype, era, power_value) VALUES
+  ('C-Role Player 01', 'Common', 'Defender',  'Modern', 10),
+  ('C-Role Player 02', 'Common', 'Shooter',   'Modern', 10),
+  ('C-Role Player 03', 'Common', 'Playmaker', 'Modern', 10),
+  ('C-Role Player 04', 'Common', 'Defender',  '00s',    10),
+  ('C-Role Player 05', 'Common', 'Shooter',   '00s',    10),
+  ('C-Role Player 06', 'Common', 'Playmaker', '00s',    10),
+  ('C-Role Player 07', 'Common', 'Defender',  '90s',    10),
+  ('C-Role Player 08', 'Common', 'Shooter',   '90s',    10),
+  ('C-Role Player 09', 'Common', 'Playmaker', '90s',    10),
+  ('C-Role Player 10', 'Common', 'Defender',  'Modern', 10),
+  ('C-Role Player 11', 'Common', 'Shooter',   'Modern', 10),
+  ('C-Role Player 12', 'Common', 'Playmaker', 'Modern', 10),
+  ('C-Role Player 13', 'Common', 'Defender',  '00s',    10),
+  ('C-Role Player 14', 'Common', 'Shooter',   '00s',    10),
+  ('C-Role Player 15', 'Common', 'Playmaker', '00s',    10),
+  ('C-Role Player 16', 'Common', 'Defender',  '90s',    10),
+  ('C-Role Player 17', 'Common', 'Shooter',   '90s',    10),
+  ('C-Role Player 18', 'Common', 'Playmaker', '90s',    10),
+  ('C-Role Player 19', 'Common', 'Defender',  'Modern', 10),
+  ('C-Role Player 20', 'Common', 'Shooter',   'Modern', 10),
+  ('R-Starter 01', 'Rare', 'Shooter',   'Modern', 16),
+  ('R-Starter 02', 'Rare', 'Playmaker', 'Modern', 16),
+  ('R-Starter 03', 'Rare', 'Defender',  'Modern', 16),
+  ('R-Starter 04', 'Rare', 'Shooter',   '00s',    16),
+  ('R-Starter 05', 'Rare', 'Playmaker', '00s',    16),
+  ('R-Starter 06', 'Rare', 'Defender',  '00s',    16),
+  ('R-Starter 07', 'Rare', 'Shooter',   '90s',    16),
+  ('R-Starter 08', 'Rare', 'Playmaker', '90s',    16),
+  ('R-Starter 09', 'Rare', 'Defender',  '90s',    16),
+  ('R-Starter 10', 'Rare', 'Shooter',   'Modern', 16),
+  ('R-Starter 11', 'Rare', 'Playmaker', 'Modern', 16),
+  ('R-Starter 12', 'Rare', 'Defender',  'Modern', 16),
+  ('E-All Star 01', 'Epic', 'Shooter',   'Modern', 23),
+  ('E-All Star 02', 'Epic', 'Playmaker', 'Modern', 23),
+  ('E-All Star 03', 'Epic', 'Defender',  '00s',    23),
+  ('E-All Star 04', 'Epic', 'Shooter',   '00s',    23),
+  ('E-All Star 05', 'Epic', 'Playmaker', '90s',    23),
+  ('E-All Star 06', 'Epic', 'Defender',  '90s',    23),
+  ('L-Legend 01', 'Legendary', 'Shooter',   '90s', 31),
+  ('L-Legend 02', 'Legendary', 'Playmaker', '00s', 31);
   
 
-  INSERT INTO BasketballPlayer (player_id, name, rarity, archetype, era, power_value) VALUES
-  (1,  'C-Role Player 01', 'Common', 'Defender',  'Modern', 10),
-  (2,  'C-Role Player 02', 'Common', 'Shooter',   'Modern', 10),
-  (3,  'C-Role Player 03', 'Common', 'Playmaker', 'Modern', 10),
-  (4,  'C-Role Player 04', 'Common', 'Defender',  '00s',    10),
-  (5,  'C-Role Player 05', 'Common', 'Shooter',   '00s',    10),
-  (6,  'C-Role Player 06', 'Common', 'Playmaker', '00s',    10),
-  (7,  'C-Role Player 07', 'Common', 'Defender',  '90s',    10),
-  (8,  'C-Role Player 08', 'Common', 'Shooter',   '90s',    10),
-  (9,  'C-Role Player 09', 'Common', 'Playmaker', '90s',    10),
-  (10, 'C-Role Player 10', 'Common', 'Defender',  'Modern', 10),
-  (11, 'C-Role Player 11', 'Common', 'Shooter',   'Modern', 10),
-  (12, 'C-Role Player 12', 'Common', 'Playmaker', 'Modern', 10),
-  (13, 'C-Role Player 13', 'Common', 'Defender',  '00s',    10),
-  (14, 'C-Role Player 14', 'Common', 'Shooter',   '00s',    10),
-  (15, 'C-Role Player 15', 'Common', 'Playmaker', '00s',    10),
-  (16, 'C-Role Player 16', 'Common', 'Defender',  '90s',    10),
-  (17, 'C-Role Player 17', 'Common', 'Shooter',   '90s',    10),
-  (18, 'C-Role Player 18', 'Common', 'Playmaker', '90s',    10),
-  (19, 'C-Role Player 19', 'Common', 'Defender',  'Modern', 10),
-  (20, 'C-Role Player 20', 'Common', 'Shooter',   'Modern', 10),
-  
-  (21, 'R-Starter 01', 'Rare', 'Shooter',   'Modern', 16),
-  (22, 'R-Starter 02', 'Rare', 'Playmaker', 'Modern', 16),
-  (23, 'R-Starter 03', 'Rare', 'Defender',  'Modern', 16),
-  (24, 'R-Starter 04', 'Rare', 'Shooter',   '00s',    16),
-  (25, 'R-Starter 05', 'Rare', 'Playmaker', '00s',    16),
-  (26, 'R-Starter 06', 'Rare', 'Defender',  '00s',    16),
-  (27, 'R-Starter 07', 'Rare', 'Shooter',   '90s',    16),
-  (28, 'R-Starter 08', 'Rare', 'Playmaker', '90s',    16),
-  (29, 'R-Starter 09', 'Rare', 'Defender',  '90s',    16),
-  (30, 'R-Starter 10', 'Rare', 'Shooter',   'Modern', 16),
-  (31, 'R-Starter 11', 'Rare', 'Playmaker', 'Modern', 16),
-  (32, 'R-Starter 12', 'Rare', 'Defender',  'Modern', 16),
-  
-  (33, 'E-All Star 01', 'Epic', 'Shooter',   'Modern', 23),
-  (34, 'E-All Star 02', 'Epic', 'Playmaker', 'Modern', 23),
-  (35, 'E-All Star 03', 'Epic', 'Defender',  '00s',    23),
-  (36, 'E-All Star 04', 'Epic', 'Shooter',   '00s',    23),
-  (37, 'E-All Star 05', 'Epic', 'Playmaker', '90s',    23),
-  (38, 'E-All Star 06', 'Epic', 'Defender',  '90s',    23),
-  
-  (39, 'L-Legend 01', 'Legendary', 'Shooter',   '90s', 31),
-  (40, 'L-Legend 02', 'Legendary', 'Playmaker', '00s', 31);
-  
-
-  INSERT INTO SummonBanner (banner_id, name, cost_points, is_active) VALUES
-  (1, 'Standard Banner', 50, 1),
-  (2, '90s Classics (Rate-Up)', 60, 1);
+  INSERT INTO SummonBanner (name, cost_points) VALUES
+  ('Standard Banner', 50),
+  ('90s Classics (Rate-Up)', 60);
   
   INSERT INTO BannerPlayer (banner_id, player_id)
   SELECT 1, player_id FROM BasketballPlayer;
@@ -317,10 +312,10 @@ const SQLSTATEMENT = `
   (10,1,6),(10,2,30),(10,3,32),(10,4,37),(10,5,38);
   
 
-  INSERT INTO SynergyRule (rule_id, name, buff_type, buff_value) VALUES
-  (1, 'Splash Duo',   'TEAM_POWER_MULT', 1.050),
-  (2, 'Defense Wall', 'TEAM_POWER_MULT', 1.050),
-  (3, 'Legend Pair',  'TEAM_POWER_MULT', 1.100);
+  INSERT INTO SynergyRule (name, buff_type, buff_value) VALUES
+  ('Splash Duo',   'TEAM_POWER_MULT', 1.050),
+  ('Defense Wall', 'TEAM_POWER_MULT', 1.050),
+  ('Legend Pair',  'TEAM_POWER_MULT', 1.100);
   
   INSERT INTO SynergyRuleMember (rule_id, player_id) VALUES
   (1, 21), (1, 30),
@@ -328,14 +323,14 @@ const SQLSTATEMENT = `
   (3, 39), (3, 40);
   
 
-  INSERT INTO UserRoster (roster_id, user_id, player_id) VALUES
-  (1, 1, 1),
-  (2, 1, 2),
-  (3, 1, 3),
-  (4, 1, 4),
-  (5, 1, 5),
-  (6, 1, 21),
-  (7, 1, 22);
+  INSERT INTO UserRoster (user_id, player_id) VALUES
+  (1, 1),
+  (1, 2),
+  (1, 3),
+  (1, 4),
+  (1, 5),
+  (1, 21),
+  (1, 22);
   
   INSERT INTO UserTeam (user_id, slot, player_id) VALUES
   (1, 1, 1),
