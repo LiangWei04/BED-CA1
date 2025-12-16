@@ -20,9 +20,9 @@ module.exports.createChallenge = (req, res, next) => {
   if (
     req.body.description == undefined ||
     req.body.user_id == undefined ||
-    req.body.points == undefined 
+    req.body.points == undefined
   ) {
-    res.status(400).json({message: "Missing required data"});
+    res.status(400).json({ message: "Missing required data" });
     return;
   }
   const data = {
@@ -77,14 +77,13 @@ module.exports.updateChallengeById = (req, res, next) => {
           message: "Challenge not found",
         });
       } else {
-            res.status(200).json({
-                challenge_id: data.challenge_id,
-                description: data.description,
-                creator_id: data.user_id,
-                points: data.points,
-            });
+        res.status(200).json({
+          challenge_id: data.challenge_id,
+          description: data.description,
+          creator_id: data.user_id,
+          points: data.points,
+        });
       }
-
     }
   };
   model.updateChallengeById(data, callback);
