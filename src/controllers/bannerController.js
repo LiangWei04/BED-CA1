@@ -13,6 +13,7 @@ module.exports.readAll = (req, res, next) =>{
 }
 
 module.exports.summonBannerActive = (req, res, next) =>{
+   if (req.body == undefined) return res.status(400).json({message: "body is undefined"})
    if (req.body.banner_id == undefined) return res.status(400).json({message: "banner_id is missing"});
    const data = {
       banner_id: req.body.banner_id
