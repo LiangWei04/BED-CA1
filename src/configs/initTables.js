@@ -79,17 +79,25 @@ const SQLSTATEMENT = `
     roster_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     player_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
     obtained_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     CONSTRAINT fk_roster_user
       FOREIGN KEY (user_id) REFERENCES User(user_id)
       ON UPDATE CASCADE
       ON DELETE CASCADE,
+
     CONSTRAINT fk_roster_player
       FOREIGN KEY (player_id) REFERENCES BasketballPlayer(player_id)
       ON UPDATE CASCADE
       ON DELETE RESTRICT,
+
+    CONSTRAINT uq_user_player
+      UNIQUE (user_id, player_id),
+
     INDEX idx_roster_user (user_id),
     INDEX idx_roster_player (player_id)
+
   );
   
   CREATE TABLE UserTeam (
@@ -268,7 +276,7 @@ const SQLSTATEMENT = `
   ( 'Baron Davis',     'Rare', 'Playmaker', 'Modern', 16),
   ( 'Andrew Wiggins',  'Rare', 'Defender',  'Modern', 16),
 
-  ( 'Stephen Curry',   'Epic', 'Shooter',   'Modern', 23),
+  ( 'LeBron James',    'Epic', 'Playmaker', '00s', 31),
   ( 'Kevin Durant',    'Epic', 'Playmaker', 'Modern', 23),
   ( 'Kobe Bryant',     'Epic', 'Defender',  '00s',    23),
   ( 'Shaquille O’Neal','Epic', 'Shooter',   '00s',    23),
@@ -276,7 +284,7 @@ const SQLSTATEMENT = `
   ( 'Charles Barkley', 'Epic', 'Defender',  '90s',    23),
 
   ( 'Michael Jordan',  'Legendary', 'Shooter',   '90s', 31),
-  ( 'LeBron James',    'Legendary', 'Playmaker', '00s', 31);
+  ( 'Stephen Curry',   'Legendary', 'Shooter',   'Modern', 23);
 
   
 
@@ -327,14 +335,14 @@ const SQLSTATEMENT = `
   (3, 39), (3, 40);
   
 
-  INSERT INTO UserRoster (user_id, player_id) VALUES
-  (1, 1),
-  (1, 2),
-  (1, 3),
-  (1, 4),
-  (1, 5),
-  (1, 21),
-  (1, 22);
+  INSERT INTO UserRoster (user_id, player_id, quantity) VALUES
+  (1, 1, 1),
+  (1, 2, 1),
+  (1, 3, 1),
+  (1, 4, 1),
+  (1, 5, 1),
+  (1, 21, 1),
+  (1, 22, 1);
   
   INSERT INTO UserTeam (user_id, slot, player_id) VALUES
   (1, 1, 1),
