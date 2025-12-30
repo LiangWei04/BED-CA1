@@ -67,7 +67,7 @@ module.exports.getUserById = (req, res, next) => {
           if (err) {
             console.error("Error: ", err);
             res.status(500).json(err);
-          } else{
+          } else {
             req.body.points = ress[1]?.[0]?.points;
           }
         };
@@ -83,17 +83,17 @@ module.exports.getPlayerRandom = (req, res, next) => {
   const data = {
     user_id: req.body.user_id,
     banner_id: req.body.banner_id,
-    tierType: req.body.tierType
+    tierType: req.body.tierType,
   };
   const callback = (error, results, fields) => {
     if (error) {
       console.error("Error some:", error);
       res.status(500).json(error);
     } else {
-        req.body.player_id = results[0].player_id;
-        req.body.name = results[0].name;
-        req.body.rarity = results[0].rarity;
-        next();
+      req.body.player_id = results[0].player_id;
+      req.body.name = results[0].name;
+      req.body.rarity = results[0].rarity;
+      next();
     }
   };
   model.selectPlayerByRandom(data, callback);
@@ -107,7 +107,7 @@ module.exports.establishRel = (req, res, next) => {
     points: req.body.points,
     player_id: req.body.player_id,
     name: req.body.name,
-    rarity: req.body.rarity
+    rarity: req.body.rarity,
   };
   const callback = (error, results, fields) => {
     if (error) {
@@ -126,4 +126,3 @@ module.exports.establishRel = (req, res, next) => {
   };
   model.insertPlayerUserRel(data, callback);
 };
-

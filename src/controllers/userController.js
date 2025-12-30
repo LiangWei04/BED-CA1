@@ -84,9 +84,7 @@ module.exports.updateUserById = (req, res, next) => {
     req.body.points == undefined ||
     req.body.tickets == undefined
   ) {
-    res
-      .status(400)
-      .send("Error: a or username or points or tickets is undefined");
+    res.status(400).send("Error: username or points or tickets is undefined");
     return;
   }
   const data = {
@@ -132,92 +130,88 @@ module.exports.deleteUserById = (req, res, next) => {
   model.deleteUserById(data, callback);
 };
 
-
-module.exports.readPlayerUserRel = (req, res, next) =>{
-   const data = {
-      user_id: req.params.user_id
-   }
-   const callback = (error, results, fields) => {
-      if (error) {
-         console.error("Error readPlayerUserRel:", error);
-         res.status(500).json(error);
-      } else {
-         if(results.length == 0) 
-         {
-            res.status(404).json({
-               message: "No player belongs to User"
-            });
-         }
-         else res.status(200).json(results);
-      }
-   }
-   model.selectPlayerByUser(data, callback)
-}
-
-module.exports.updateTeamById = (req, res, next) =>{
-   if (req.body.player_ids == undefined){
-      res.status(400).send("Missing required information");
-      return;
-   }
-   const data = {
-      user_id:  req.params.user_id,
-      player_ids: req.body.player_ids
-   };
-
-   const callback = (error, results, fields) => {
-      if (error) {
-         console.error("Error updateTeamById:", error);
-         res.status(500).json(error);
-      } else {
-          const ids = req.body.player_ids;
-          const unique = new Set(ids);
-          if (unique.size !== ids.length) {
-            return res.status(400).json({ message: "Duplicate player_id in team is not allowed" });
-          }
-          if (results.length == 0)
-            return res.status(404).json({message: "User not found"});
-          if (data.player_ids.length !== 5)
-            return res.status(400).json({message: "Team not exactly 5 players"});
-          for (const j of data.player_ids){
-            const player = results.some(i => i.player_id == j);
-            
-            if (!player)
-              return res.status(403).json({message: "Player does not belong to User"});
-          }
-          const callback = (err, ress) =>{
-            if (err){
-              console.error("Error updateTeamById:", err);
-              res.status(500).json(err);
-            } else{
-              res.status(204).send()
-            }
-          }
-          model.updateTeamById(data, callback)
-            
-      };
-   };
-   model.selectPlayerByUser(data,callback);
+module.exports.readPlayerUserRel = (req, res, next) => {
+  const data = {
+    user_id: req.params.user_id,
+  };
+  const callback = (error, results, fields) => {
+    if (error) {
+      console.error("Error readPlayerUserRel:", error);
+      res.status(500).json(error);
+    } else {
+      if (results.length == 0) {
+        res.status(404).json({
+          message: "No player belongs to User",
+        });
+      } else res.status(200).json(results);
+    }
+  };
+  model.selectPlayerByUser(data, callback);
 };
 
+module.exports.updateTeamById = (req, res, next) => {
+  if (req.body.player_ids == undefined) {
+    res.status(400).send("Missing required information");
+    return;
+  }
+  const data = {
+    user_id: req.params.user_id,
+    player_ids: req.body.player_ids,
+  };
 
-module.exports.readTeamById = (req, res, next) =>{
-   const data = {
-      user_id: req.params.user_id
-   }
-   const callback = (error, results, fields) => {
-      if (error) {
-         console.error("Error readTeamById:", error);
-         res.status(500).json(error);
-      } else {
-         if(results.length == 0) 
-         {
-            res.status(404).json({
-               message: "Team not found"
-            });
-         }
-         else res.status(200).json(results);
+  const callback = (error, results, fields) => {
+    if (error) {
+      console.error("Error updateTeamById:", error);
+      res.status(500).json(error);
+    } else {
+      const ids = req.body.player_ids;
+      const unique = new Set(ids);
+      if (unique.size !== ids.length) {
+        return res
+          .status(400)
+          .json({ message: "Duplicate player_id in team is not allowed" });
       }
-   }
-   model.selectTeamById(data, callback)
-}
+      if (results.length == 0)
+        return res.status(404).json({ message: "User not found" });
+      if (data.player_ids.length !== 5)
+        return res.status(400).json({ message: "Team not exactly 5 players" });
+      for (const j of data.player_ids) {
+        const player = results.some((i) => i.player_id == j);
 
+        if (!player)
+          return res
+            .status(403)
+            .json({ message: "Player does not belong to User" });
+      }
+      const callback = (err, ress) => {
+        if (err) {
+          console.error("Error updateTeamById:", err);
+          res.status(500).json(err);
+        } else {
+          res.status(204).send();
+        }
+      };
+      model.updateTeamById(data, callback);
+    }
+  };
+  model.selectPlayerByUser(data, callback);
+};
+
+module.exports.readTeamById = (req, res, next) => {
+  const data = {
+    user_id: req.params.user_id,
+  };
+  const callback = (error, results, fields) => {
+    if (error) {
+      console.error("Error readTeamById:", error);
+      res.status(500).json(error);
+    } else {
+      if (results.length == 0) {
+        res.status(404).json({
+          message: "Team not found",
+        });
+      } else res.status(200).json(results);
+    }
+  };
+  model.selectTeamById(data, callback);
+};

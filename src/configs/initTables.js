@@ -215,6 +215,18 @@ const SQLSTATEMENT = `
       ON DELETE RESTRICT
   );
 
+  CREATE TABLE SynergyRuleCondition (
+    rule_id INT NOT NULL,
+    condition_type ENUM('ARCHETYPE','ERA') NOT NULL,
+    condition_value VARCHAR(32) NOT NULL,
+    required_count TINYINT NOT NULL,
+    PRIMARY KEY (rule_id, condition_type, condition_value),
+    CONSTRAINT fk_src_rule
+      FOREIGN KEY (rule_id) REFERENCES SynergyRule(rule_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+
   INSERT INTO User (username) VALUES
   ('liam'),
   ('amanda'),
@@ -323,17 +335,47 @@ const SQLSTATEMENT = `
   (9,1,5),(9,2,26),(9,3,29),(9,4,35),(9,5,36),
   (10,1,6),(10,2,30),(10,3,32),(10,4,37),(10,5,38);
   
+  INSERT INTO SynergyRule (name, buff_type, buff_value)
+  VALUES ('3 Shooters', 'TEAM_POWER_MULT', 1.060);
+  SET @rule_id = LAST_INSERT_ID();
+  INSERT INTO SynergyRuleCondition (rule_id, condition_type, condition_value, required_count)
+  VALUES (@rule_id, 'ARCHETYPE', 'Shooter', 3);
 
-  INSERT INTO SynergyRule (name, buff_type, buff_value) VALUES
-  ('Splash Duo',   'TEAM_POWER_MULT', 1.050),
-  ('Defense Wall', 'TEAM_POWER_MULT', 1.050),
-  ('Legend Pair',  'TEAM_POWER_MULT', 1.100);
+  INSERT INTO SynergyRule (name, buff_type, buff_value)
+  VALUES ('4x 90s Era', 'TEAM_POWER_MULT', 1.080);
+  SET @rule_id = LAST_INSERT_ID();
+  INSERT INTO SynergyRuleCondition (rule_id, condition_type, condition_value, required_count)
+  VALUES (@rule_id, 'ERA', '90s', 4);
   
-  INSERT INTO SynergyRuleMember (rule_id, player_id) VALUES
-  (1, 21), (1, 30),
-  (2, 26), (2, 32),
-  (3, 39), (3, 40);
-  
+  -- Splash Duo
+  INSERT INTO SynergyRule (name, buff_type, buff_value)
+  VALUES ('Splash Duo', 'TEAM_POWER_MULT', 1.050);
+  SET @splash_rule = LAST_INSERT_ID();
+
+  INSERT INTO SynergyRuleMember (rule_id, player_id)
+  VALUES
+  (@splash_rule, 21),
+  (@splash_rule, 30);
+
+  -- Defense Wall
+  INSERT INTO SynergyRule (name, buff_type, buff_value)
+  VALUES ('Defense Wall', 'TEAM_POWER_MULT', 1.050);
+  SET @defense_rule = LAST_INSERT_ID();
+
+  INSERT INTO SynergyRuleMember (rule_id, player_id)
+  VALUES
+  (@defense_rule, 26),
+  (@defense_rule, 32);
+
+  -- Legend Pair
+  INSERT INTO SynergyRule (name, buff_type, buff_value)
+  VALUES ('Legend Pair', 'TEAM_POWER_MULT', 1.100);
+  SET @legend_rule = LAST_INSERT_ID();
+
+  INSERT INTO SynergyRuleMember (rule_id, player_id)
+  VALUES
+  (@legend_rule, 39),
+  (@legend_rule, 40);
 
   INSERT INTO UserRoster (user_id, player_id, quantity) VALUES
   (1, 1, 1),
