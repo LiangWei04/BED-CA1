@@ -1,5 +1,8 @@
+// Handles marking challenges as completed and rewarding points
+
 const model = require("../models/completionModel");
 
+// Get all users who completed a specific challenge (by challenge_id)
 module.exports.readCompletionById = (req, res, next) => {
   const data = {
     challenge_id: req.params.challenge_id,
@@ -19,6 +22,7 @@ module.exports.readCompletionById = (req, res, next) => {
   model.selectById(data, callback);
 };
 
+// Mark a challenge as completed and award points to the user
 module.exports.createCompletion = (req, res, next) => {
   if (req.body == undefined) {
     res.status(400).json({ message: "Missing required data." });

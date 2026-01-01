@@ -1,3 +1,5 @@
+// Handles user creation, updates, and basic validation checks
+
 const model = require("../models/userModel");
 
 module.exports.readAll = (req, res, next) => {
@@ -12,7 +14,8 @@ module.exports.readAll = (req, res, next) => {
   model.selectAll(callback);
 };
 
-module.exports.readAllp = (req, res, next) => {
+// Middleware: stop request if username is already taken
+module.exports.rejectDuplicateUsername = (req, res, next) => {
   let data = {
     username: req.body.username,
   };
@@ -33,6 +36,7 @@ module.exports.readAllp = (req, res, next) => {
   model.selectAll(callback);
 };
 
+// Fetch a single user by id, used by other routes as a guard
 module.exports.readUserById = (req, res, next) => {
   const data = {
     user_id: req.params.user_id,
@@ -52,6 +56,7 @@ module.exports.readUserById = (req, res, next) => {
   model.selectById(data, callback);
 };
 
+// Create a new user, reject if username already exists
 module.exports.createUser = (req, res, next) => {
   if (req.body == undefined) {
     res.status(400).json({ message: "Missing required data." });
@@ -78,6 +83,8 @@ module.exports.createUser = (req, res, next) => {
   model.insertSingle(data, callback);
 };
 
+// Update username or points for a user
+// Used mainly for admin / testing purposes
 module.exports.updateUserById = (req, res, next) => {
   if (
     req.body.username == undefined ||
@@ -149,6 +156,7 @@ module.exports.readPlayerUserRel = (req, res, next) => {
   model.selectPlayerByUser(data, callback);
 };
 
+// Handles user team setup and roster management
 module.exports.updateTeamById = (req, res, next) => {
   if (req.body.player_ids == undefined) {
     res.status(400).send("Missing required information");

@@ -1,3 +1,5 @@
+// Handles wellness challenge creation, updates, and deletion
+
 const model = require("../models/challengeModel");
 
 module.exports.readAll = (req, res, next) => {
@@ -12,6 +14,7 @@ module.exports.readAll = (req, res, next) => {
   model.selectAll(callback);
 };
 
+// Create a new challenge under a specific user (creator)
 module.exports.createChallenge = (req, res, next) => {
   if (req.body == undefined) {
     res.status(400).json({ message: "Missing required data." });
@@ -46,6 +49,7 @@ module.exports.createChallenge = (req, res, next) => {
   model.insertSingle(data, callback);
 };
 
+// Only allow creator to update their own challenge
 module.exports.updateChallengeById = (req, res, next) => {
   if (req.body == undefined) {
     res.status(400).json({ message: "Missing required data." });
@@ -89,6 +93,7 @@ module.exports.updateChallengeById = (req, res, next) => {
   model.updateChallengeById(data, callback);
 };
 
+// Delete challenge and rely on DB cascade to clean up completions
 module.exports.deleteChallengeById = (req, res, next) => {
   const data = {
     challenge_id: req.params.challenge_id,

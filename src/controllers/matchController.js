@@ -1,3 +1,5 @@
+// Handles PvE/PvP match logic and win/lose calculation
+
 const model = require("../models/matchModel");
 
 module.exports.readMatchById = (req, res, next) => {

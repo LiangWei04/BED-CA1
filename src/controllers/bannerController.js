@@ -1,3 +1,5 @@
+// Handles banner activation and summoning logic
+
 const model = require("../models/bannerModel");
 
 module.exports.readAll = (req, res, next) => {
@@ -12,6 +14,7 @@ module.exports.readAll = (req, res, next) => {
   model.selectAll(callback);
 };
 
+// Summon a player from an active banner based on rarity probability
 module.exports.summonBannerActive = (req, res, next) => {
   if (req.body == undefined)
     return res.status(400).json({ message: "body is undefined" });
@@ -46,6 +49,8 @@ module.exports.summonBannerActive = (req, res, next) => {
   model.selectBannerById(data, callback);
 };
 
+// First callback to check whether user ticket amount is sufficient
+// Second callback to deduct ticket first, rollback if anything fails after this
 module.exports.getUserById = (req, res, next) => {
   if (req.body.user_id == undefined)
     return res.status(400).json({ message: "user_id is missing" });
@@ -79,6 +84,7 @@ module.exports.getUserById = (req, res, next) => {
   model.selectUserById(data, callback);
 };
 
+// Roll random number once and map it to a rarity tier
 module.exports.getPlayerRandom = (req, res, next) => {
   const data = {
     user_id: req.body.user_id,

@@ -32,6 +32,7 @@ module.exports.readLevelById = (req, res, next) => {
   model.selectById(data, callback);
 };
 
+// Run a match and decide outcome based on power difference + randomness
 module.exports.checkLevel = (req, res, next) => {
   const data = {
     id: req.params.level_id,
@@ -154,6 +155,7 @@ module.exports.computeOpponentPower = (req, res, next) => {
   model.selectRuleByLevel(data, callback);
 };
 
+// Higher power should usually win, but never 100% guaranteed
 module.exports.simulation = (req, res, next) => {
   const data = {
     team: req.body.teamPower,
